@@ -14,6 +14,8 @@ export interface IWhatsAppService extends IMessagingService {
 export interface ITelegramService extends IMessagingService {
   setWebhook(url: string): Promise<boolean>;
   processUpdate(update: any): Promise<Message>;
+  onMessage?(handler: (message: Message) => void): void;
+  stop?(): Promise<void>;
 }
 
 export interface IWebInterfaceService extends IMessagingService {

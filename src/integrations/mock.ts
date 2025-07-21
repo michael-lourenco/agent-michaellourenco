@@ -117,6 +117,15 @@ class MockTelegramService implements ITelegramService {
   getServiceName(): string {
     return this.serviceName;
   }
+
+  onMessage(handler: (message: Message) => void): void {
+    // Mock implementation - não faz nada
+    logger.info('Mock Telegram onMessage called (no real handlers)');
+  }
+
+  async stop(): Promise<void> {
+    logger.info('Mock Telegram service stopped');
+  }
 }
 
 class MockWebInterfaceService implements IWebInterfaceService {

@@ -3,6 +3,7 @@ import healthRoutes from './health';
 import messagingRoutes from './messaging';
 import aiRoutes from './ai';
 import webInterfaceRoutes from './web-interface';
+import telegramRoutes from './telegram';
 
 const router = Router();
 
@@ -17,5 +18,8 @@ router.use('/ai', aiRoutes);
 
 // Rotas da interface web
 router.use('/web', webInterfaceRoutes);
+
+// Rotas do Telegram
+router.use('/telegram', telegramRoutes);
 
 export default router; 

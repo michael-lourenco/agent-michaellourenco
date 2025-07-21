@@ -60,6 +60,14 @@ Abra seu navegador e acesse: http://localhost:3000/playground
 - Interface web para testar o agente IA
 - Exemplos de perguntas pré-definidas
 - Chat em tempo real com respostas mockadas
+- Status do bot Telegram em tempo real
+
+### Bot Telegram Real
+- Integração completa com Telegram Bot API
+- Respostas automáticas com IA
+- Comandos `/start` e `/help`
+- Modo mock para desenvolvimento
+- Status visível no playground
 
 ### API Endpoints
 
@@ -87,6 +95,11 @@ Abra seu navegador e acesse: http://localhost:3000/playground
 - `GET /api/web/session/:sessionId` - Validar sessão
 - `POST /api/web/message` - Enviar mensagem via web
 - `POST /api/web/receive` - Receber mensagem via web
+
+#### Telegram
+- `GET /api/telegram/status` - Verificar status do bot
+- `POST /api/telegram/send` - Enviar mensagem para o Telegram
+- `POST /api/telegram/process` - Processar mensagem do Telegram
 
 ## 🧪 Testes
 
@@ -165,6 +178,26 @@ curl -X POST http://localhost:3000/api/messaging/telegram/webhook \
   }'
 ```
 
+### 4. Testar Telegram
+```bash
+# Verificar informações do bot
+yarn telegram:info
+
+# Verificar status do bot
+curl -X GET http://localhost:3000/api/telegram/status
+
+# Enviar mensagem para o Telegram
+curl -X POST http://localhost:3000/api/telegram/send \
+  -H "Content-Type: application/json" \
+  -d '{
+    "chatId": "123456789",
+    "content": "Olá! Esta é uma mensagem de teste."
+  }'
+
+# Resetar serviço (se houver conflitos)
+yarn telegram:reset
+```
+
 ## 🔧 Configuração
 
 ### Variáveis de Ambiente
@@ -219,7 +252,7 @@ LOG_LEVEL=info
 
 ### 3. Integrações
 - Substituir `MockWhatsAppService` por WhatsApp Business API
-- Substituir `MockTelegramService` por Telegram Bot API
+- ✅ **Telegram já implementado** - Configure `TELEGRAM_BOT_TOKEN` no .env
 - Manter `MockWebInterfaceService` ou implementar interface real
 
 ### 4. Configuração
@@ -233,7 +266,7 @@ LOG_LEVEL=info
 2. **Integrar OpenAI**: Configurar API key e modelos
 3. **Configurar Pinecone**: Base de conhecimento vetorial
 4. **Implementar WhatsApp**: WhatsApp Business API
-5. **Implementar Telegram**: Telegram Bot API
+5. ✅ **Telegram Implementado**: Configure o token no .env
 6. **Adicionar Autenticação**: JWT + middleware de segurança
 7. **Implementar Cache**: Redis para performance
 8. **Adicionar Monitoramento**: Logs estruturados + métricas
