@@ -33,9 +33,9 @@ router.post('/process', async (req: Request, res: Response) => {
     };
 
     const response = await aiEngine.processMessage(message, mockUser, context);
-    res.json(response);
+    return res.json(response);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to process message' });
+    return res.status(500).json({ error: 'Failed to process message' });
   }
 });
 
@@ -49,9 +49,9 @@ router.post('/sentiment', async (req: Request, res: Response) => {
     }
 
     const sentiment = await aiEngine.analyzeSentiment(text);
-    res.json({ sentiment, text });
+    return res.json({ sentiment, text });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to analyze sentiment' });
+    return res.status(500).json({ error: 'Failed to analyze sentiment' });
   }
 });
 
@@ -65,9 +65,9 @@ router.post('/intent', async (req: Request, res: Response) => {
     }
 
     const intent = await aiEngine.extractIntent(text);
-    res.json({ intent, text });
+    return res.json({ intent, text });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to extract intent' });
+    return res.status(500).json({ error: 'Failed to extract intent' });
   }
 });
 
@@ -81,9 +81,9 @@ router.post('/knowledge/search', async (req: Request, res: Response) => {
     }
 
     const results = await knowledgeBase.search(query, limit || 5);
-    res.json({ results, query });
+    return res.json({ results, query });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to search knowledge base' });
+    return res.status(500).json({ error: 'Failed to search knowledge base' });
   }
 });
 
@@ -97,9 +97,9 @@ router.post('/knowledge/add', async (req: Request, res: Response) => {
     }
 
     await knowledgeBase.addDocument(content, metadata);
-    res.json({ success: true });
+    return res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to add document' });
+    return res.status(500).json({ error: 'Failed to add document' });
   }
 });
 
@@ -113,9 +113,9 @@ router.post('/langchain/generate', async (req: Request, res: Response) => {
     }
 
     const response = await langChainService.generateResponse(prompt, context);
-    res.json({ response, prompt });
+    return res.json({ response, prompt });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to generate response' });
+    return res.status(500).json({ error: 'Failed to generate response' });
   }
 });
 

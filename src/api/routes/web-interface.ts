@@ -1,22 +1,25 @@
 import { Router, Request, Response } from 'express';
-import { MockWebInterfaceService } from '../../integrations/mock';
 
 const router = Router();
-const webService = new MockWebInterfaceService();
 
 // Criar sessão
 router.post('/session', async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
-
+    
     if (!userId) {
-      return res.status(400).json({ error: 'Missing userId field' });
+      return res.status(400).json({ error: 'userId is required' });
     }
 
-    const sessionId = await webService.createSession(userId);
-    res.json({ sessionId, userId });
+    const sessionId = `web_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    return res.json({
+      success: true,
+      sessionId,
+      userId
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create session' });
+    return res.status(500).json({ error: 'Failed to create session' });
   }
 });
 
@@ -24,41 +27,47 @@ router.post('/session', async (req: Request, res: Response) => {
 router.get('/session/:sessionId', async (req: Request, res: Response) => {
   try {
     const { sessionId } = req.params;
-
-    const user = await webService.validateSession(sessionId);
-    if (!user) {
-      return res.status(404).json({ error: 'Session not found' });
+    
+    if (!sessionId) {
+      return res.status(400).json({ error: 'sessionId is required' });
     }
 
-    res.json({ user, sessionId });
+    // Mock validation
+    const isValid = sessionId.startsWith('web_');
+    
+    return res.json({
+      success: true,
+      valid: isValid,
+      sessionId
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to validate session' });
+    return res.status(500).json({ error: 'Failed to validate session' });
   }
 });
 
-// Enviar mensagem via web
+// Enviar mensagem
 router.post('/message', async (req: Request, res: Response) => {
   try {
-    const { userId, content, sessionId } = req.body;
-
-    if (!userId || !content) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const { sessionId, content } = req.body;
+    
+    if (!sessionId || !content) {
+      return res.status(400).json({ error: 'sessionId and content are required' });
     }
 
-    const success = await webService.sendMessage(userId, content, { sessionId });
-    res.json({ success, messageId: `web_msg_${Date.now()}` });
+    // Mock response
+    const response = {
+      id: `msg_${Date.now()}`,
+      content: `Mock response to: ${content}`,
+      timestamp: new Date(),
+      sessionId
+    };
+    
+    return res.json({
+      success: true,
+      response
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to send message' });
-  }
-});
-
-// Receber mensagem via web
-router.post('/receive', async (req: Request, res: Response) => {
-  try {
-    const message = await webService.receiveMessage(req.body);
-    res.json({ success: true, message });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to receive message' });
+    return res.status(500).json({ error: 'Failed to send message' });
   }
 });
 

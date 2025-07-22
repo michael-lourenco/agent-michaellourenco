@@ -125,7 +125,7 @@ Você também pode simplesmente digitar suas perguntas e eu responderei!
 
   async setWebhook(url: string): Promise<boolean> {
     try {
-      await this.bot.setWebhook(url);
+      await this.bot.setWebHook(url);
       logger.info(`Telegram webhook set to: ${url}`);
       return true;
     } catch (error) {

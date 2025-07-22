@@ -5,64 +5,59 @@ const router = Router();
 const whatsappService = new MockWhatsAppService();
 const telegramService = new MockTelegramService();
 
-// Webhook WhatsApp
-router.post('/whatsapp/webhook', async (req: Request, res: Response) => {
+// Enviar mensagem WhatsApp
+router.post('/whatsapp/send', async (req: Request, res: Response) => {
   try {
-    const message = await whatsappService.processWebhook(req.body);
-    res.json({ success: true, messageId: message.id });
+    const { phoneNumber, message } = req.body;
+
+    if (!phoneNumber || !message) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const success = await whatsappService.sendMessage(phoneNumber, message);
+    return res.json({ success, phoneNumber, message });
   } catch (error) {
-    res.status(400).json({ error: 'Invalid webhook payload' });
+    return res.status(500).json({ error: 'Failed to send WhatsApp message' });
   }
 });
 
-// Verificação WhatsApp
-router.get('/whatsapp/webhook', (req: Request, res: Response) => {
-  const mode = req.query['hub.mode'];
-  const token = req.query['hub.verify_token'];
-  const challenge = req.query['hub.challenge'];
-
-  if (mode === 'subscribe' && token === 'mock_token') {
-    const response = whatsappService.verifyWebhook(token as string, challenge as string);
-    res.send(response);
-  } else {
-    res.status(403).send('Forbidden');
-  }
-});
-
-// Webhook Telegram
-router.post('/telegram/webhook', async (req: Request, res: Response) => {
+// Enviar mensagem Telegram
+router.post('/telegram/send', async (req: Request, res: Response) => {
   try {
-    const message = await telegramService.processUpdate(req.body);
-    res.json({ success: true, messageId: message.id });
+    const { chatId, message } = req.body;
+
+    if (!chatId || !message) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const success = await telegramService.sendMessage(chatId, message);
+    return res.json({ success, chatId, message });
   } catch (error) {
-    res.status(400).json({ error: 'Invalid update payload' });
+    return res.status(500).json({ error: 'Failed to send Telegram message' });
   }
 });
 
-// Enviar mensagem
+// Enviar mensagem genérica
 router.post('/send', async (req: Request, res: Response) => {
   try {
-    const { userId, content, channel, metadata } = req.body;
+    const { channel, userId, message } = req.body;
 
-    if (!userId || !content || !channel) {
+    if (!channel || !userId || !message) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     let success = false;
-    switch (channel) {
-      case 'whatsapp':
-        success = await whatsappService.sendMessage(userId, content, metadata);
-        break;
-      case 'telegram':
-        success = await telegramService.sendMessage(userId, content, metadata);
-        break;
-      default:
-        return res.status(400).json({ error: 'Invalid channel' });
+    if (channel === 'whatsapp') {
+      success = await whatsappService.sendMessage(userId, message);
+    } else if (channel === 'telegram') {
+      success = await telegramService.sendMessage(userId, message);
+    } else {
+      return res.status(400).json({ error: 'Invalid channel' });
     }
 
-    res.json({ success, messageId: `msg_${Date.now()}` });
+    return res.json({ success, channel, userId, message });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to send message' });
+    return res.status(500).json({ error: 'Failed to send message' });
   }
 });
 

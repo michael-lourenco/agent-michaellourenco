@@ -21,14 +21,14 @@ router.post('/session', async (req: Request, res: Response) => {
     
     logger.info(`WebChat session created: ${sessionId} for user: ${userId}`);
     
-    res.json({
+    return res.json({
       success: true,
       sessionId,
       message: 'Sessão criada com sucesso'
     });
   } catch (error) {
     logger.error('Error creating web chat session:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao criar sessão'
     });
@@ -55,7 +55,7 @@ router.post('/message', async (req: Request, res: Response) => {
     
     logger.info(`WebChat message processed: ${content.substring(0, 50)}...`);
     
-    res.json({
+    return res.json({
       success: true,
       userMessage: {
         id: userMessage.id,
@@ -72,7 +72,7 @@ router.post('/message', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Error processing web chat message:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao processar mensagem'
     });
@@ -93,7 +93,7 @@ router.get('/history/:sessionId', async (req: Request, res: Response) => {
 
     const history = await processor.getWebChatHistory(sessionId);
     
-    res.json({
+    return res.json({
       success: true,
       history: history.map(msg => ({
         id: msg.id,
@@ -104,7 +104,7 @@ router.get('/history/:sessionId', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Error getting web chat history:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao obter histórico'
     });
@@ -127,13 +127,13 @@ router.delete('/history/:sessionId', async (req: Request, res: Response) => {
     
     logger.info(`WebChat history cleared for session: ${sessionId}`);
     
-    res.json({
+    return res.json({
       success: true,
       message: 'Histórico limpo com sucesso'
     });
   } catch (error) {
     logger.error('Error clearing web chat history:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao limpar histórico'
     });
@@ -145,13 +145,13 @@ router.get('/stats', (req: Request, res: Response) => {
   try {
     const stats = processor.getStats();
     
-    res.json({
+    return res.json({
       success: true,
       stats
     });
   } catch (error) {
     logger.error('Error getting stats:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao obter estatísticas'
     });
@@ -187,7 +187,7 @@ router.post('/validate', async (req: Request, res: Response) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       user: {
         id: user.id,
@@ -196,7 +196,7 @@ router.post('/validate', async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Error validating session:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Erro ao validar sessão'
     });

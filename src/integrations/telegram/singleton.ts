@@ -39,7 +39,9 @@ export class TelegramServiceSingleton {
     if (TelegramServiceSingleton.instance) {
       try {
         if ('stop' in TelegramServiceSingleton.instance) {
-          TelegramServiceSingleton.instance.stop();
+          if (TelegramServiceSingleton.instance.stop) {
+            TelegramServiceSingleton.instance.stop();
+          }
         }
       } catch (error) {
         logger.error('Error stopping Telegram service:', error);

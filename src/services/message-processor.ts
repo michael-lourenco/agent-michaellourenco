@@ -16,7 +16,7 @@ export class MessageProcessor {
 
   private setupMessageHandlers(): void {
     // Registrar handler para mensagens do Telegram
-    if (this.telegramService && 'onMessage' in this.telegramService) {
+    if (this.telegramService && 'onMessage' in this.telegramService && this.telegramService.onMessage) {
       this.telegramService.onMessage(async (message: Message) => {
         await this.processIncomingMessage(message);
       });
@@ -113,7 +113,7 @@ export class MessageProcessor {
 
   // Método para parar o serviço
   async stop(): Promise<void> {
-    if (this.telegramService && 'stop' in this.telegramService) {
+    if (this.telegramService && 'stop' in this.telegramService && this.telegramService.stop) {
       await this.telegramService.stop();
     }
   }
