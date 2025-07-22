@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat com Michael Lourenço - Agente IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            border: 1px solid #e1e5e9;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .session-info {
+            background: #e8f4fd;
+            padding: 10px 20px;
+            border-bottom: 1px solid #e1e5e9;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .error-message {
+            background: #ffe6e6;
+            color: #d63031;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                width: 95%;
+                height: 90vh;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🤖 Chat com Michael Lourenço</h1>
+            <p>Agente IA especializado em informações profissionais</p>
+        </div>
+        
+        <div class="session-info" id="sessionInfo">
+            Inicializando sessão...
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="message-content">
+                    Olá! Sou o agente IA do Michael Lourenço. Posso responder suas perguntas sobre experiência profissional, tecnologias, projetos, formação acadêmica e contatos. Como posso ajudar?
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            Michael está digitando...
+        </div>
+        
+        <div class="chat-input-container">
+            <form class="chat-input-form" id="chatForm">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="messageInput" 
+                    placeholder="Digite sua mensagem..."
+                    autocomplete="off"
+                >
+                <button type="submit" class="send-button" id="sendButton">
+                    Enviar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        class WebChat {
+            constructor() {
+                this.sessionId = null;
+                this.userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                this.apiBase = window.location.origin + '/api/webchat';
+                
+                console.log('WebChat inicializando...');
+                console.log('API Base:', this.apiBase);
+                console.log('User ID:', this.userId);
+                
+                this.initializeElements();
+                this.initializeSession();
+                this.setupEventListeners();
+            }
+
+            initializeElements() {
+                this.chatMessages = document.getElementById('chatMessages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendButton = document.getElementById('sendButton');
+                this.chatForm = document.getElementById('chatForm');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                this.sessionInfo = document.getElementById('sessionInfo');
+                this.errorMessage = document.getElementById('errorMessage');
+                
+                console.log('Elementos inicializados');
+            }
+
+            async initializeSession() {
+                try {
+                    console.log('Inicializando sessão...');
+                    const response = await fetch(`${this.apiBase}/session`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userId: this.userId })
+                    });
+
+                    console.log('Response status:', response.status);
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    
+                    if (data.success) {
+                        this.sessionId = data.sessionId;
+                        this.sessionInfo.textContent = `Sessão: ${this.sessionId.substring(0, 20)}...`;
+                        this.messageInput.disabled = false;
+                        this.sendButton.disabled = false;
+                        console.log('Sessão criada com sucesso:', this.sessionId);
+                    } else {
+                        throw new Error(data.error || 'Erro desconhecido');
+                    }
+                } catch (error) {
+                    console.error('Erro ao inicializar sessão:', error);
+                    this.showError('Erro ao inicializar sessão: ' + error.message);
+                }
+            }
+
+            setupEventListeners() {
+                this.chatForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.sendMessage();
+                });
+
+                this.messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
+                
+                console.log('Event listeners configurados');
+            }
+
+            async sendMessage() {
+                const content = this.messageInput.value.trim();
+                if (!content || !this.sessionId) {
+                    console.log('Mensagem vazia ou sessão não inicializada');
+                    return;
+                }
+
+                console.log('Enviando mensagem:', content);
+
+                // Adicionar mensagem do usuário
+                this.addMessage(content, 'user');
+                this.messageInput.value = '';
+                this.sendButton.disabled = true;
+
+                // Mostrar indicador de digitação
+                this.showTyping();
+
+                try {
+                    console.log('Fazendo requisição para:', `${this.apiBase}/message`);
+                    const response = await fetch(`${this.apiBase}/message`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            sessionId: this.sessionId,
+                            content: content,
+                            userId: this.userId
+                        })
+                    });
+
+                    console.log('Response status:', response.status);
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    
+                    if (data.success) {
+                        this.hideTyping();
+                        this.addMessage(data.aiResponse.content, 'bot');
+                    } else {
+                        throw new Error(data.error || 'Erro desconhecido');
+                    }
+                } catch (error) {
+                    console.error('Erro ao enviar mensagem:', error);
+                    this.hideTyping();
+                    this.showError('Erro ao enviar mensagem: ' + error.message);
+                    this.addMessage('Desculpe, ocorreu um erro. Tente novamente.', 'bot');
+                } finally {
+                    this.sendButton.disabled = false;
+                    this.messageInput.focus();
+                }
+            }
+
+            addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const time = new Date().toLocaleTimeString('pt-BR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        ${this.escapeHtml(content)}
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+
+                this.chatMessages.appendChild(messageDiv);
+                this.scrollToBottom();
+                
+                console.log('Mensagem adicionada:', sender, content.substring(0, 50));
+            }
+
+            showTyping() {
+                this.typingIndicator.style.display = 'block';
+                this.scrollToBottom();
+            }
+
+            hideTyping() {
+                this.typingIndicator.style.display = 'none';
+            }
+
+            showError(message) {
+                console.error('Erro:', message);
+                this.errorMessage.textContent = message;
+                this.errorMessage.style.display = 'block';
+                setTimeout(() => {
+                    this.errorMessage.style.display = 'none';
+                }, 5000);
+            }
+
+            scrollToBottom() {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Inicializar chat quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM carregado, inicializando WebChat...');
+            new WebChat();
+        });
+    </script>
+</body>
+</html> 

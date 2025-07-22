@@ -1,7 +1,7 @@
 export interface Message {
   id: string;
   userId: string;
-  channel: 'whatsapp' | 'telegram' | 'web';
+  channel: 'whatsapp' | 'telegram' | 'web' | 'webchat';
   content: string;
   timestamp: Date;
   direction: 'inbound' | 'outbound';
@@ -40,7 +40,7 @@ export interface AIResponse {
 export interface Conversation {
   id: string;
   userId: string;
-  channel: 'whatsapp' | 'telegram' | 'web';
+  channel: 'whatsapp' | 'telegram' | 'web' | 'webchat';
   status: 'active' | 'closed' | 'escalated';
   messages: Message[];
   createdAt: Date;

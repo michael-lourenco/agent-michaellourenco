@@ -21,4 +21,20 @@ export interface ITelegramService extends IMessagingService {
 export interface IWebInterfaceService extends IMessagingService {
   createSession(userId: string): Promise<string>;
   validateSession(sessionId: string): Promise<User | null>;
+}
+
+// Nova interface para chat web
+export interface IWebChatService extends IMessagingService {
+  createSession(userId: string): Promise<string>;
+  validateSession(sessionId: string): Promise<User | null>;
+  getSessionHistory(sessionId: string): Promise<Message[]>;
+  clearSession(sessionId: string): Promise<void>;
+}
+
+// Interface para canais genéricos
+export interface IChannelService extends IMessagingService {
+  channelType: 'telegram' | 'whatsapp' | 'web' | 'webchat' | 'api';
+  onMessage?(handler: (message: Message) => void): void;
+  stop?(): Promise<void>;
+  isConnected?(): boolean;
 } 

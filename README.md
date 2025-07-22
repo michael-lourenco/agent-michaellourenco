@@ -101,6 +101,48 @@ npm install
 
 ### 3. Configure as variáveis de ambiente
 ```bash
+cp env.example .env
+# Edite o arquivo .env com suas configurações
+```
+
+### 4. Execute o projeto
+```bash
+yarn dev
+```
+
+### 5. Acesse as interfaces
+- **Chat Web**: http://localhost:3000/chat
+- **Playground**: http://localhost:3000
+- **API WebChat**: http://localhost:3000/api/webchat
+
+## 💬 Chat Web
+
+O projeto agora inclui um chat web completo que permite conversar com o agente de IA diretamente no navegador:
+
+### **Funcionalidades:**
+- ✅ Interface moderna e responsiva
+- ✅ Sessões de chat persistentes
+- ✅ Histórico de conversas
+- ✅ Indicador de digitação
+- ✅ Tratamento de erros
+- ✅ Design mobile-friendly
+
+### **Como usar o Chat Web:**
+1. Acesse http://localhost:3000/chat
+2. Uma sessão será criada automaticamente
+3. Digite suas perguntas sobre Michael Lourenço
+4. O agente responderá com base na base de conhecimento
+
+### **API Endpoints:**
+- `POST /api/webchat/session` - Criar nova sessão
+- `POST /api/webchat/message` - Enviar mensagem
+- `GET /api/webchat/history/:sessionId` - Obter histórico
+- `DELETE /api/webchat/history/:sessionId` - Limpar histórico
+- `GET /api/webchat/stats` - Estatísticas
+- `POST /api/webchat/validate` - Validar sessão
+
+### 3. Configure as variáveis de ambiente
+```bash
 cp .env.example .env
 # Edite o arquivo .env com suas credenciais
 ```

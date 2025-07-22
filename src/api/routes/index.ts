@@ -4,6 +4,7 @@ import messagingRoutes from './messaging';
 import aiRoutes from './ai';
 import webInterfaceRoutes from './web-interface';
 import telegramRoutes from './telegram';
+import webchatRoutes from './webchat';
 
 const router = Router();
 
@@ -21,5 +22,8 @@ router.use('/web', webInterfaceRoutes);
 
 // Rotas do Telegram
 router.use('/telegram', telegramRoutes);
+
+// Rotas do WebChat
+router.use('/webchat', webchatRoutes);
 
 export default router; 
