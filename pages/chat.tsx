@@ -31,12 +31,15 @@ export default function Chat() {
     initializeSession();
   }, []);
 
+  const [userId, setUserId] = useState<string>('');
+
   const initializeSession = async () => {
     try {
       setError(null);
-      const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const newUserId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      setUserId(newUserId);
       
-      const data = await ApiClient.createSession(userId);
+      const data = await ApiClient.createSession(newUserId);
       setSessionId(data.sessionId);
       setIsInitializing(false);
       console.log('Sessão criada com sucesso:', data.sessionId);
@@ -63,7 +66,7 @@ export default function Chat() {
     setError(null);
 
     try {
-      const data = await ApiClient.sendMessage(sessionId, inputMessage);
+      const data = await ApiClient.sendMessage(sessionId, inputMessage, userId);
       
       if (data.success && data.aiResponse) {
         const aiMessage: Message = {

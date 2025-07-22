@@ -34,24 +34,33 @@ export class ApiClient {
     }
   }
 
-  static async sendMessage(sessionId: string, content: string): Promise<any> {
+  static async sendMessage(sessionId: string, content: string, userId: string): Promise<any> {
     const apiUrl = this.getApiBaseUrl();
     console.log('Enviando mensagem para API:', apiUrl);
     
     try {
+      const requestBody = {
+        sessionId,
+        content,
+        userId,
+      };
+      
+      console.log('Enviando requisição:', requestBody);
+      
       const response = await fetch(`${apiUrl}/api/webchat/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          sessionId,
-          content,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log('Status da resposta:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Erro da API:', errorText);
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
       }
 
       return await response.json();

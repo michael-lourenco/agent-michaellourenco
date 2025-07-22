@@ -146,10 +146,18 @@ O projeto inclui um chat web completo que permite conversar com o agente de IA d
 - ✅ Design mobile-friendly
 
 ### **Como usar o Chat Web:**
-1. Acesse http://localhost:3001/chat
-2. Uma sessão será criada automaticamente
-3. Digite suas perguntas sobre Michael Lourenço
-4. O agente responderá com base na base de conhecimento
+1. **Certifique-se de que o backend está rodando:** `yarn dev`
+2. **Execute o frontend:** `yarn dev:next`
+3. **Acesse:** http://localhost:3001/chat
+4. **Uma sessão será criada automaticamente**
+5. **Digite suas perguntas sobre Michael Lourenço**
+6. **O agente responderá com base na base de conhecimento**
+
+### **Teste da API:**
+```bash
+# Teste se a API está funcionando
+node test-chat.js
+```
 
 ### **API Endpoints:**
 - `POST /api/webchat/session` - Criar nova sessão

@@ -40,7 +40,10 @@ router.post('/message', async (req: Request, res: Response) => {
   try {
     const { sessionId, content, userId } = req.body;
     
+    console.log('Recebida requisição de mensagem:', { sessionId, content: content?.substring(0, 50), userId });
+    
     if (!sessionId || !content || !userId) {
+      console.log('Campos obrigatórios faltando:', { sessionId: !!sessionId, content: !!content, userId: !!userId });
       return res.status(400).json({
         success: false,
         error: 'sessionId, content e userId são obrigatórios'
