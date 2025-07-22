@@ -111,13 +111,31 @@ yarn dev
 ```
 
 ### 5. Acesse as interfaces
-- **Chat Web**: http://localhost:3000/chat
-- **Playground**: http://localhost:3000
+- **Página de Apresentação**: http://localhost:3001
+- **Chat Web**: http://localhost:3001/chat
+- **API Backend**: http://localhost:3000
 - **API WebChat**: http://localhost:3000/api/webchat
+
+## 🎨 Página de Apresentação
+
+O projeto agora inclui uma página de apresentação moderna em **Next.js** que apresenta o agente de IA de forma profissional:
+
+### **Funcionalidades:**
+- ✅ Design moderno e responsivo
+- ✅ SEO otimizado
+- ✅ Navegação suave
+- ✅ Call-to-action destacado
+- ✅ Informações sobre o projeto
+- ✅ Links para contato
+
+### **Como acessar:**
+1. Execute `yarn dev:next` para iniciar o frontend
+2. Acesse http://localhost:3001
+3. Navegue pela página e clique em "Conversar com IA"
 
 ## 💬 Chat Web
 
-O projeto agora inclui um chat web completo que permite conversar com o agente de IA diretamente no navegador:
+O projeto inclui um chat web completo que permite conversar com o agente de IA diretamente no navegador:
 
 ### **Funcionalidades:**
 - ✅ Interface moderna e responsiva
@@ -128,7 +146,7 @@ O projeto agora inclui um chat web completo que permite conversar com o agente d
 - ✅ Design mobile-friendly
 
 ### **Como usar o Chat Web:**
-1. Acesse http://localhost:3000/chat
+1. Acesse http://localhost:3001/chat
 2. Uma sessão será criada automaticamente
 3. Digite suas perguntas sobre Michael Lourenço
 4. O agente responderá com base na base de conhecimento
