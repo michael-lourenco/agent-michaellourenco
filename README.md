@@ -223,3 +223,17 @@ Para suporte, entre em contato:
 ---
 
 **Desenvolvido com ❤️ pela equipe Michael Lourenço** 
+
+## IA Gratuita com Hugging Face
+
+1. Crie uma conta gratuita em https://huggingface.co/
+2. Vá em Settings > Access Tokens > New Token (role: read)
+3. Copie o token e adicione no seu `.env`:
+
+```
+HUGGINGFACE_API_KEY=seu_token_aqui
+HUGGINGFACE_MODEL=google/flan-t5-small
+```
+
+4. Rode o projeto normalmente (`yarn dev`).
+5. O bot usará o Hugging Face como IA padrão se o token estiver configurado. 

@@ -1,5 +1,10 @@
 import { AIResponse, Message, User } from '../types';
 
+export { MockAIEngine } from './mock';
+export { OpenAIEngine } from './openai';
+export { OllamaEngine } from './ollama';
+export { HuggingFaceEngine } from './huggingface';
+
 export interface IAIEngine {
   processMessage(message: string, user: User, context?: Message[]): Promise<AIResponse>;
   analyzeSentiment(text: string): Promise<number>; // -1 to 1 (negative to positive)

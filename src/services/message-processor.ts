@@ -1,22 +1,22 @@
 import { Message, User, AIResponse } from '../types';
 import { ITelegramService } from '../integrations/interfaces';
-import { MockAIEngine } from '../ai/mock';
+import AIFactory from '../ai/factory';
 import { TelegramServiceSingleton } from '../integrations/telegram/singleton';
 import logger from '../utils/logger';
 
 export class MessageProcessor {
   private telegramService: ITelegramService;
-  private aiEngine: MockAIEngine;
+  private aiFactory: AIFactory;
 
   constructor() {
     this.telegramService = TelegramServiceSingleton.getInstance();
-    this.aiEngine = new MockAIEngine();
+    this.aiFactory = AIFactory.getInstance();
     this.setupMessageHandlers();
   }
 
   private setupMessageHandlers(): void {
     // Registrar handler para mensagens do Telegram
-    if ('onMessage' in this.telegramService) {
+    if (this.telegramService && 'onMessage' in this.telegramService) {
       this.telegramService.onMessage(async (message: Message) => {
         await this.processIncomingMessage(message);
       });
@@ -46,18 +46,25 @@ export class MessageProcessor {
       };
 
       // Processar mensagem com IA
-      const aiResponse = await this.aiEngine.processMessage(message.content, user);
+      const aiResponse = await this.aiFactory.getAIEngine().processMessage(message.content, user);
 
       // Enviar resposta de volta para o Telegram
       const chatId = message.metadata?.chatId || message.userId;
-      await this.telegramService.sendMessage(chatId, aiResponse.content, {
-        chatId: chatId,
-        options: {
-          parse_mode: 'Markdown',
-        },
-      });
+      logger.info(`Sending response to chat ${chatId}, content length: ${aiResponse.content.length}`);
+      
+      try {
+        await this.telegramService.sendMessage(chatId, aiResponse.content, {
+          chatId: chatId,
+          options: {
+            parse_mode: 'Markdown',
+          },
+        });
 
-      logger.info(`Response sent to ${chatId}: ${aiResponse.content.substring(0, 50)}...`);
+        logger.info(`✅ Response sent successfully to ${chatId}: ${aiResponse.content.substring(0, 50)}...`);
+      } catch (sendError) {
+        logger.error(`❌ Error sending message to ${chatId}:`, sendError);
+        throw sendError;
+      }
 
     } catch (error) {
       logger.error('Error processing incoming message:', error);
@@ -86,7 +93,7 @@ export class MessageProcessor {
       updatedAt: new Date(),
     };
 
-    return await this.aiEngine.processMessage(message.content, user);
+    return await this.aiFactory.getAIEngine().processMessage(message.content, user);
   }
 
   // Método para enviar mensagem para o Telegram
@@ -106,7 +113,7 @@ export class MessageProcessor {
 
   // Método para parar o serviço
   async stop(): Promise<void> {
-    if ('stop' in this.telegramService) {
+    if (this.telegramService && 'stop' in this.telegramService) {
       await this.telegramService.stop();
     }
   }
