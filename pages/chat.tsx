@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { ApiClient } from '../utils/api';
 
 interface Message {
   id: string;
@@ -15,6 +16,7 @@ export default function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -31,26 +33,16 @@ export default function Chat() {
 
   const initializeSession = async () => {
     try {
+      setError(null);
       const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      const response = await fetch('/api/webchat/session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setSessionId(data.sessionId);
-        setIsInitializing(false);
-      } else {
-        console.error('Erro ao criar sessão');
-        setIsInitializing(false);
-      }
+      const data = await ApiClient.createSession(userId);
+      setSessionId(data.sessionId);
+      setIsInitializing(false);
+      console.log('Sessão criada com sucesso:', data.sessionId);
     } catch (error) {
       console.error('Erro ao inicializar sessão:', error);
+      setError('Erro ao conectar com o servidor. Verifique se o backend está rodando.');
       setIsInitializing(false);
     }
   };
@@ -68,49 +60,32 @@ export default function Chat() {
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setIsLoading(true);
+    setError(null);
 
     try {
-      const response = await fetch('/api/webchat/message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId,
-          content: inputMessage,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        if (data.success && data.aiResponse) {
-          const aiMessage: Message = {
-            id: `ai_${Date.now()}`,
-            content: data.aiResponse.content,
-            timestamp: new Date(),
-            direction: 'inbound',
-          };
-          setMessages(prev => [...prev, aiMessage]);
-        }
-      } else {
-        const errorMessage: Message = {
-          id: `error_${Date.now()}`,
-          content: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+      const data = await ApiClient.sendMessage(sessionId, inputMessage);
+      
+      if (data.success && data.aiResponse) {
+        const aiMessage: Message = {
+          id: `ai_${Date.now()}`,
+          content: data.aiResponse.content,
           timestamp: new Date(),
           direction: 'inbound',
         };
-        setMessages(prev => [...prev, errorMessage]);
+        setMessages(prev => [...prev, aiMessage]);
+      } else {
+        throw new Error('Resposta inválida da API');
       }
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
       const errorMessage: Message = {
         id: `error_${Date.now()}`,
-        content: 'Erro de conexão. Verifique sua internet e tente novamente.',
+        content: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
         timestamp: new Date(),
         direction: 'inbound',
       };
       setMessages(prev => [...prev, errorMessage]);
+      setError('Erro de conexão. Verifique sua internet e tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -160,6 +135,17 @@ export default function Chat() {
             </div>
           </div>
         </header>
+
+        {/* Error Banner */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 px-4 py-3">
+            <div className="max-w-4xl mx-auto">
+              <p className="text-red-800 text-sm">
+                ⚠️ {error}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto p-4">

@@ -5,10 +5,15 @@ const nextConfig = {
   
   // Configuração para redirecionar chamadas da API para o servidor Express
   async rewrites() {
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const apiUrl = isDevelopment 
+      ? 'http://localhost:3000/api/:path*'
+      : `${process.env.API_BASE_URL || 'https://your-backend-url.vercel.app'}/api/:path*`;
+    
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3000/api/:path*', // Redireciona para o servidor Express
+        destination: apiUrl,
       },
     ];
   },
